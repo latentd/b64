@@ -12,52 +12,107 @@ const INDEX_TABLE: [char; 64] = [
     '4', '5', '6', '7', '8', '9', '+', '-',
 ];
 
-fn get_sextets(octets: &[u8]) -> Vec<u8> {
+fn convert_to_sextets(input: String) -> Vec<u8> {
 
+    let octets = input.as_bytes();
     let mut sextets: Vec<u8> = Vec::new();
 
-    for i in 0..octets.len() {
-        let n = i % 3; 
-        if n == 0 {
-            sextets.push(
-                (octets[i] & 0b11111100) >> 2
-            );
-            if i == octets.len() - 1 {
-                sextets.push(
-                    (octets[i] & 0b00000011) << 4
-                )
-            }
-        } else if n == 1 {
-            sextets.push(
-                (octets[i-1] & 0b00000011) << 4 | ((octets[i] & 0b11110000) >> 4)
-            );
-            if i == octets.len() - 1 {
-                sextets.push(
-                    (octets[i] & 0b00001111) << 2
-                )
-            }
-        } else if n == 2 {
-            sextets.push(
-                (octets[i-1] & 0b00001111) << 2 | ((octets[i] & 0b11000000) >> 6)
-            );
-            sextets.push(octets[i] & 0b00111111)
+    if input.len() == 0 { return sextets; };
+
+    let mut i = 0;
+    loop {
+        match i % 3 {
+            0 => sextets.push((octets[i] & 0b11111100) >> 2),
+            1 => sextets.push((octets[i-1] & 0b00000011) << 4 | ((octets[i] & 0b11110000) >> 4)),
+            2 => {
+                    sextets.push((octets[i-1] & 0b00001111) << 2 | ((octets[i] & 0b11000000) >> 6));
+                    sextets.push(octets[i] & 0b00111111);
+            },
+            _ => {},
         };
+        if i  >= octets.len() - 1 { break; };
+        i += 1;
     };
+    match i % 3 {
+        0 => sextets.push((octets[i] & 0b00000011) << 4),
+        1 => sextets.push((octets[i] & 0b00001111) << 2),
+        _ => (),
+    };
+
     sextets
 }
 
-fn encode(input: String) -> String {
-    let mut encoded = String::from("");
+fn add_padding(encoded: &mut String) {
+    let length = encoded.len();
+    if length % 4 != 0 {
+        for _ in (length % 4)..4 {
+            encoded.push('=');
+        };
+    };
+}
 
-    let input_bytes = input.as_bytes();
-    let sextets = get_sextets(input_bytes); 
+fn render_sextets(sextets: Vec<u8>) -> String {
+    let mut encoded = String::new();
     for s in sextets {
         encoded.push(INDEX_TABLE[s as usize]);
     };
-    for _ in encoded.len()%4..4 {
-        encoded.push('=');
-    };
     encoded
+}
+
+fn base64_encode(input: String) -> String {
+    let sextets = convert_to_sextets(input); 
+    let mut encoded = render_sextets(sextets);
+    add_padding(&mut encoded);
+    encoded
+}
+
+#[test]
+fn encode_test_vectors_empty_rfc4648() {
+    let input = "";
+    let want = "";
+    assert_eq!(base64_encode(input.to_string()), want);
+}
+
+#[test]
+fn encode_test_vectors_f_rfc4648() {
+    let input = "f";
+    let want = "Zg==";
+    assert_eq!(base64_encode(input.to_string()), want);
+}
+
+#[test]
+fn encode_test_vectors_fo_rfc4648() {
+    let input = "fo";
+    let want = "Zm8=";
+    assert_eq!(base64_encode(input.to_string()), want);
+}
+
+#[test]
+fn encode_test_vectors_foo_rfc4648() {
+    let input = "foo";
+    let want = "Zm9v";
+    assert_eq!(base64_encode(input.to_string()), want);
+}
+
+#[test]
+fn encode_test_vectors_foob_rfc4648() {
+    let input = "foob";
+    let want = "Zm9vYg==";
+    assert_eq!(base64_encode(input.to_string()), want);
+}
+
+#[test]
+fn encode_test_vectors_fooba_rfc4648() {
+    let input = "fooba";
+    let want = "Zm9vYmE=";
+    assert_eq!(base64_encode(input.to_string()), want);
+}
+
+#[test]
+fn encode_test_vectors_foobar_rfc4648() {
+    let input = "foobar";
+    let want = "Zm9vYmFy";
+    assert_eq!(base64_encode(input.to_string()), want);
 }
 
 /// Base64 encode/decode util
@@ -71,6 +126,5 @@ fn main() {
     setup_panic!();
 
     let args = Cli::parse();
-    println!("{}", encode(args.input));
-    panic!("tet")
+    println!("{}", base64_encode(args.input));
 }
