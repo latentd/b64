@@ -1,31 +1,58 @@
-name: Create tag and release
+name: Release
+
 on:
   push:
     tags:
       - 'v*'
+
 jobs:
-  release:
-    name: Build and Release
-    runs-on: ubuntu-latest
+
+  build:
+    matrix:
+      target:
+        - x86_64-unknown-linux-gnu
+        - x86_64-unknown-linux-musl
+        - x86_64-apple-darwin
+      include:
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-latest
+        - target: x86_64-unknown-linux-musl
+          os: ubuntu-latest
+        - target: x86_64-apple-darwin
+          os: macos-latest
+    name: Build
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: |
+          sudo apt install -qq -y musl-tools --no-install-recommends
       - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
+          target: ${{ matrix.target }}
           override: true
       - name: Build
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release
+          args: --release --target=${{ matrix.target }}
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: b64
-          path: target/release/b64
+          name: b64-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/b64
+
+  create-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.after_create_release.outputs.upload-url }}
+    steps:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -36,12 +63,28 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      - id: after_create_release
+        run: echo "::set-output name=upload-url::${{ steps.create_release.outputs.upload_url }}"
+
+  upload-release:
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - x86_64-apple-darwin
+    needs: [create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: b64-${{ matrix.target }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/release/b64
-          asset_name: b64
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: b64-${{ matrix.target }}
+          asset_name: b64-${{ matrix.target }}
           asset_content_type: application/zip
