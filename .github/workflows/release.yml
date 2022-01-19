@@ -42,11 +42,13 @@ jobs:
         with:
           command: build
           args: --release --target=${{ matrix.target }}
+      - name: Package
+        run: zip --junk-paths b64-${{ matrix.target }} target/${{ matrix.target }}/release/b64
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: b64-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/b64
+          name: build-${{ matrix.target }}
+          path: b64-${{ matrix.target }}.zip
 
   create-release:
     needs: [build]
@@ -79,13 +81,13 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: b64-${{ matrix.target }}
+          name: build-${{ matrix.target }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: b64-${{ matrix.target }}
-          asset_name: b64-${{ matrix.target }}
+          asset_path: build-${{ matrix.target }}/b64-${{ matrix.target }}.zip
+          asset_name: b64-${{ matrix.target }}.zip
           asset_content_type: application/zip
