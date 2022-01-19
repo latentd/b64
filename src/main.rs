@@ -1,38 +1,38 @@
 use clap::Parser;
+use colored::*;
 use human_panic::setup_panic;
 
 const INDEX_TABLE: [char; 64] = [
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-    'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-    'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-    'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-    'w', 'x', 'y', 'z', '0', '1', '2', '3',
-    '4', '5', '6', '7', '8', '9', '+', '-',
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+    'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9', '+', '-',
 ];
 
 fn convert_to_sextets(input: String) -> Vec<u8> {
-
     let octets = input.as_bytes();
     let mut sextets: Vec<u8> = Vec::new();
 
-    if input.len() == 0 { return sextets; };
+    if input.len() == 0 {
+        return sextets;
+    };
 
     let mut i = 0;
     loop {
         match i % 3 {
             0 => sextets.push((octets[i] & 0b11111100) >> 2),
-            1 => sextets.push((octets[i-1] & 0b00000011) << 4 | ((octets[i] & 0b11110000) >> 4)),
+            1 => sextets.push((octets[i - 1] & 0b00000011) << 4 | ((octets[i] & 0b11110000) >> 4)),
             2 => {
-                    sextets.push((octets[i-1] & 0b00001111) << 2 | ((octets[i] & 0b11000000) >> 6));
-                    sextets.push(octets[i] & 0b00111111);
-            },
-            _ => {},
+                sextets.push((octets[i - 1] & 0b00001111) << 2 | ((octets[i] & 0b11000000) >> 6));
+                sextets.push(octets[i] & 0b00111111);
+            }
+            _ => {}
         };
-        if i  >= octets.len() - 1 { break; };
+        if i >= octets.len() - 1 {
+            break;
+        };
         i += 1;
-    };
+    }
     match i % 3 {
         0 => sextets.push((octets[i] & 0b00000011) << 4),
         1 => sextets.push((octets[i] & 0b00001111) << 2),
@@ -47,7 +47,7 @@ fn add_padding(encoded: &mut String) {
     if length % 4 != 0 {
         for _ in (length % 4)..4 {
             encoded.push('=');
-        };
+        }
     };
 }
 
@@ -55,12 +55,12 @@ fn render_sextets(sextets: Vec<u8>) -> String {
     let mut encoded = String::new();
     for s in sextets {
         encoded.push(INDEX_TABLE[s as usize]);
-    };
+    }
     encoded
 }
 
 fn base64_encode(input: String) -> String {
-    let sextets = convert_to_sextets(input); 
+    let sextets = convert_to_sextets(input);
     let mut encoded = render_sextets(sextets);
     add_padding(&mut encoded);
     encoded
@@ -120,13 +120,10 @@ fn strip_padding(input: String) -> String {
 }
 
 fn reverse_render_sextets(text: String) -> Vec<u8> {
-    text
-    .chars()
-    .map(|c| {
-        INDEX_TABLE.iter().position(|v| v == &c).unwrap()
-    })
-    .map(|c| c as u8 )
-    .collect::<Vec<u8>>()
+    text.chars()
+        .map(|c| INDEX_TABLE.iter().position(|v| v == &c).unwrap())
+        .map(|c| c as u8)
+        .collect::<Vec<u8>>()
 }
 
 fn reverse_convert_to_sextets(sextets: Vec<u8>) -> String {
@@ -135,11 +132,11 @@ fn reverse_convert_to_sextets(sextets: Vec<u8>) -> String {
         let length = chunk.len();
         let mut bits: u32 = 0;
         for i in 0..length {
-            bits |= (chunk[i] as u32) << (3-i)*6;
+            bits |= (chunk[i] as u32) << (3 - i) * 6;
         }
         let bytes = bits.to_be_bytes()[1..length].to_vec();
         decoded.push_str(std::str::from_utf8(&bytes).unwrap());
-    };
+    }
     decoded
 }
 
@@ -214,9 +211,9 @@ fn main() {
     let args = Cli::parse();
     let result;
     if args.decode {
-        result = base64_decode(args.input)
+        result = base64_decode(args.input).cyan()
     } else {
-        result =base64_encode(args.input)
+        result = base64_encode(args.input).green()
     }
     println!("{}", result);
 }
