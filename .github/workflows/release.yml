@@ -6,7 +6,6 @@ on:
       - 'v*'
 
 jobs:
-
   build:
     strategy:
       matrix:
@@ -88,6 +87,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: build-${{ matrix.target }}/b64-${{ matrix.target }}.zip
+          asset_path: b64-${{ matrix.target }}.zip
           asset_name: b64-${{ matrix.target }}.zip
           asset_content_type: application/zip
