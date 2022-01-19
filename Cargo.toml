@@ -1,10 +1,17 @@
 [package]
 name = "b64"
 version = "0.1.0"
+authors = ["latentd latentd0@gmail.com"]
+license = "Apache-2.0"
+description = "CLI tool to encode/decode base64"
+readme = "README.md"
+reposity = "https://github.com/latentd/b64"
+keywords = ["cli", "base64"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 clap = { version = "3.0", features = ["derive"] }
+colored = "2"
 human-panic = "1.0.3"

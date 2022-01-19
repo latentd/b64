@@ -116,7 +116,7 @@ fn encode_test_vectors_foobar_rfc4648() {
 }
 
 fn strip_padding(input: String) -> String {
-    input.trim_end_matches("=").to_string()
+    input.trim_end_matches('=').to_string()
 }
 
 fn reverse_render_sextets(text: String) -> Vec<u8> {
