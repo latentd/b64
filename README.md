@@ -6,7 +6,7 @@ b64 is a simple util to encode/decode base64 texts.
 
 ## Installation
 
-Download a release binary from [GitHub Releases Page](https://github.com/latentd/b64/releases).
+Download a release binary from [Releases](https://github.com/latentd/b64/releases).
 
 ## Usage
 
