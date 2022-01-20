@@ -5,7 +5,7 @@ authors = ["latentd latentd0@gmail.com"]
 license = "Apache-2.0"
 description = "CLI tool to encode/decode base64"
 readme = "README.md"
-reposity = "https://github.com/latentd/b64"
+repository = "https://github.com/latentd/b64"
 keywords = ["cli", "base64"]
 edition = "2021"
 

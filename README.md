@@ -1,6 +1,12 @@
+[![Test](https://github.com/latentd/b64/actions/workflows/test.yml/badge.svg)](https://github.com/latentd/b64/actions?query=workflow%3ATest)
+
 # b64
 
-b64 is a simple util to encode/decode base64.
+b64 is a simple util to encode/decode base64 texts.
+
+## Installation
+
+Download a release binary from [GitHub Releases Page](https://github.com/latentd/b64/releases).
 
 ## Usage
 
