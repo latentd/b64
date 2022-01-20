@@ -1,6 +1,6 @@
 [package]
 name = "b64"
-version = "0.1.0"
+version = "0.0.6"
 authors = ["latentd latentd0@gmail.com"]
 license = "Apache-2.0"
 description = "CLI tool to encode/decode base64"
@@ -14,7 +14,6 @@ edition = "2021"
 [dependencies]
 clap = { version = "3.0", features = ["derive"] }
 colored = "2"
-human-panic = "1.0.3"
 
 [lib]
 doctest = false

@@ -6,7 +6,7 @@ fn strip_padding(input: String) -> String {
 
 fn reverse_render_sextets(text: String) -> Vec<u8> {
     text.chars()
-        .map(|c| INDEX_TABLE.iter().position(|v| v == &c).unwrap())
+        .map(|c| INDEX_TABLE.iter().position(|v| v == &c).expect(&format!("unexpected character: {}", c)))
         .map(|c| c as u8)
         .collect::<Vec<u8>>()
 }

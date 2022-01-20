@@ -1,6 +1,5 @@
 use clap::Parser;
 use colored::*;
-use human_panic::setup_panic;
 
 use b64;
 
@@ -15,8 +14,6 @@ struct Cli {
 }
 
 fn main() {
-    setup_panic!();
-
     let args = Cli::parse();
     let result;
     if args.decode {
