@@ -5,6 +5,9 @@ pub mod encode;
 
 pub use decode::decode;
 pub use encode::encode;
+use std::error::Error;
+
+pub type B64Result<T> = Result<T, Box<dyn Error>>;
 
 pub static INDEX_TABLE: [char; 64] = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',

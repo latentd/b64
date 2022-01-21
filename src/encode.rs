@@ -1,4 +1,4 @@
-use super::INDEX_TABLE;
+use super::{B64Result, INDEX_TABLE};
 
 fn convert_to_sextets(input: String) -> Vec<u8> {
     let octets = input.as_bytes();
@@ -50,9 +50,9 @@ fn render_sextets(sextets: Vec<u8>) -> String {
     encoded
 }
 
-pub fn encode(input: String) -> String {
+pub fn encode(input: String) -> B64Result<String> {
     let sextets = convert_to_sextets(input);
     let mut encoded = render_sextets(sextets);
     add_padding(&mut encoded);
-    encoded
+    Ok(encoded)
 }
