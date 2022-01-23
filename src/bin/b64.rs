@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use colored::*;
+use std::io::Read;
 
 use b64;
 
@@ -27,9 +28,16 @@ fn get_args() -> b64::B64Result<Config> {
                 .takes_value(false),
         )
         .get_matches();
-    
+
     Ok(Config {
-        input: matches.value_of("input").unwrap().to_string(),
+        input: match matches.value_of("input").unwrap() {
+            "-" => {
+                let mut buffer = String::new();
+                let _ = std::io::stdin().lock().read_to_string(&mut buffer);
+                buffer
+            }
+            x => x.to_string(),
+        },
         decode: matches.is_present("decode"),
     })
 }

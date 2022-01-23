@@ -5,8 +5,14 @@ fn strip_padding(input: String) -> String {
 }
 
 fn reverse_render_sextets(text: String) -> B64Result<Vec<u8>> {
-    Ok(text.chars()
-        .map(|c| INDEX_TABLE.iter().position(|v| v == &c).expect(&format!("unexpected character: {}", c)))
+    Ok(text
+        .chars()
+        .map(|c| {
+            INDEX_TABLE
+                .iter()
+                .position(|v| v == &c)
+                .expect(&format!("unexpected character: {}", c))
+        })
         .map(|c| c as u8)
         .collect::<Vec<u8>>())
 }

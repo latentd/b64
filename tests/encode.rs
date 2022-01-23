@@ -27,17 +27,35 @@ fn encode_test_vectors_foo_rfc4648() {
 #[test]
 fn encode_test_vectors_foob_rfc4648() {
     let mut cmd = Command::cargo_bin("b64").unwrap();
-    cmd.args(vec!["foob"]).assert().success().stdout("Zm9vYg==\n");
+    cmd.args(vec!["foob"])
+        .assert()
+        .success()
+        .stdout("Zm9vYg==\n");
 }
 
 #[test]
 fn encode_test_vectors_fooba_rfc4648() {
     let mut cmd = Command::cargo_bin("b64").unwrap();
-    cmd.args(vec!["fooba"]).assert().success().stdout("Zm9vYmE=\n");
+    cmd.args(vec!["fooba"])
+        .assert()
+        .success()
+        .stdout("Zm9vYmE=\n");
 }
 
 #[test]
 fn encode_test_vectors_foobar_rfc4648() {
     let mut cmd = Command::cargo_bin("b64").unwrap();
-    cmd.args(vec!["foobar"]).assert().success().stdout("Zm9vYmFy\n");
+    cmd.args(vec!["foobar"])
+        .assert()
+        .success()
+        .stdout("Zm9vYmFy\n");
+}
+
+#[test]
+fn encode_test_vectors_stdin() {
+    let mut cmd = Command::cargo_bin("b64").unwrap();
+    cmd.write_stdin("foobar")
+        .assert()
+        .success()
+        .stdout("Zm9vYmFy\n");
 }
