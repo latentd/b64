@@ -15,12 +15,18 @@ Download a release binary from [Releases](https://github.com/latentd/b64/release
 ```
 $ b64 foobar
 Zm9vYmFy
+
+$ echo -n "foobar" | b64
+Zm9vYmFy
 ```
 
 ### Decode
 
 ```
 $ b64 -d Zm9vYmFy 
+foobar
+
+$ echo -n "Zm9vYmFy" | b64 -d
 foobar
 ```
 
